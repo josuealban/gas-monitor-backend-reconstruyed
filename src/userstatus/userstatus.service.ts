@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserStatusDto } from './dto/create-user-status.dto';
-import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+import { CreateUserStatusDto } from './dto/create-userstatus.dto';
+import { UpdateUserStatusDto } from './dto/update-userstatus.dto';
 import { HistoryType } from '@prisma/client';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class UserStatusService {
     });
 
     // Registrar en el historial
-    await this.prisma.historyLog.create({
+    await (this.prisma as any).history.create({
       data: {
         event: HistoryType.USER_STATUS_CHANGE,
         description: `Estado de usuario actualizado a: ${dto.status}`,

@@ -4,12 +4,9 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
-
 datasource db {
   provider = "postgresql"
 }
-
 
 generator client {
   provider = "prisma-client-js"
@@ -29,13 +26,13 @@ enum UserStatus {
 }
 
 model User {
-  id            Int         @id @default(autoincrement())
-  name          String
-  email         String      @unique
-  password      String
-  role          UserRole
-  status        UserStatus  @default(PENDING)
-  createdAt     DateTime    @default(now())
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  password  String
+  role      UserRole
+  status    UserStatus @default(PENDING)
+  createdAt DateTime   @default(now())
 
   alerts        Alert[]
   notifications SystemMessage[]
@@ -43,23 +40,23 @@ model User {
 }
 
 model Device {
-  id          Int          @id @default(autoincrement())
-  name        String
-  location    String
-  apiKey      String       @unique
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
+  id        Int      @id @default(autoincrement())
+  name      String
+  location  String
+  apiKey    String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
 
   measurements Measurement[]
-  history       HistoryLog[]
+  history      HistoryLog[]
 }
 
 model GasType {
-  id        Int           @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String
   threshold Float
-  unit      String        @default("%")
-  createdAt DateTime      @default(now())
+  unit      String   @default("%")
+  createdAt DateTime @default(now())
 
   measurements Measurement[]
 }
@@ -71,18 +68,18 @@ enum RiskLevel {
 }
 
 model Measurement {
-  id         Int       @id @default(autoincrement())
-  value      Float
-  riskLevel  RiskLevel @default(NORMAL)
-  createdAt  DateTime  @default(now())
+  id        Int       @id @default(autoincrement())
+  value     Float
+  riskLevel RiskLevel @default(NORMAL)
+  createdAt DateTime  @default(now())
 
-  gasTypeId  Int
-  deviceId   Int
+  gasTypeId Int
+  deviceId  Int
 
-  gasType    GasType   @relation(fields: [gasTypeId], references: [id])
-  device     Device    @relation(fields: [deviceId], references: [id])
-  alert      Alert?
-  history    HistoryLog[]
+  gasType GasType      @relation(fields: [gasTypeId], references: [id])
+  device  Device       @relation(fields: [deviceId], references: [id])
+  alert   Alert?
+  history HistoryLog[]
 }
 
 enum AlertType {
@@ -92,28 +89,28 @@ enum AlertType {
   ADMIN_ACTION
 }
 
-model Alert {  
-  id             Int         @id @default(autoincrement())
-  category       AlertType
-  message        String
-  createdAt      DateTime    @default(now())
-  acknowledged   Boolean     @default(false)
+model Alert {
+  id           Int       @id @default(autoincrement())
+  category     AlertType
+  message      String
+  createdAt    DateTime  @default(now())
+  acknowledged Boolean   @default(false)
 
-  measurementId  Int?        @unique
-  measurement    Measurement? @relation(fields: [measurementId], references: [id])
+  measurementId Int?         @unique
+  measurement   Measurement? @relation(fields: [measurementId], references: [id])
 
-  userId         Int?
-  user           User?        @relation(fields: [userId], references: [id])
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
 }
 
 model SystemMessage {
-  id          Int        @id @default(autoincrement())
-  content     String
-  createdAt   DateTime   @default(now())
-  acknowledged Boolean   @default(false)
+  id           Int      @id @default(autoincrement())
+  content      String
+  createdAt    DateTime @default(now())
+  acknowledged Boolean  @default(false)
 
-  userId      Int?
-  user        User?      @relation(fields: [userId], references: [id])
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
 }
 
 enum HistoryType {
@@ -127,16 +124,16 @@ enum HistoryType {
 }
 
 model HistoryLog {
-  id            Int          @id @default(autoincrement())
-  event         HistoryType
-  description   String
-  createdAt     DateTime     @default(now())
+  id          Int         @id @default(autoincrement())
+  event       HistoryType
+  description String
+  createdAt   DateTime    @default(now())
 
   userId        Int?
   deviceId      Int?
   measurementId Int?
 
-  user          User?         @relation(fields: [userId], references: [id])
-  device        Device?       @relation(fields: [deviceId], references: [id])
-  measurement   Measurement?  @relation(fields: [measurementId], references: [id])
+  user        User?        @relation(fields: [userId], references: [id])
+  device      Device?      @relation(fields: [deviceId], references: [id])
+  measurement Measurement? @relation(fields: [measurementId], references: [id])
 }
