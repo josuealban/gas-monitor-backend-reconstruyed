@@ -4,6 +4,11 @@ const { PrismaClient } = require('@prisma/client');
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private prisma: any;
+  gasType: any;
+  device: any;
+  measurement: any;
+  historyLog: any;
+  alert: any;
 
   constructor() {
     this.prisma = new PrismaClient();
@@ -11,11 +16,11 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     await this.prisma.$connect();
-    console.log('🚀 Prisma conectado correctamente');
+    console.log(' Prisma conectado correctamente');
   }
 
   async onModuleDestroy() {
     await this.prisma.$disconnect();
-    console.log('🔌 Prisma desconectado');
+    console.log(' Prisma desconectado');
   }
 }
