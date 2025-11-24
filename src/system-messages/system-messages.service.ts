@@ -1,39 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSystemMessageDto } from './dto/create-system-message.dto';
 import { UpdateSystemMessageDto } from './dto/update-system-message.dto';
 
 @Injectable()
 export class SystemMessagesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  create(data: CreateSystemMessageDto) {
-    return (this.prisma as any).systemMessage.create({ data });
+  async create(data: CreateSystemMessageDto) {
+    return await (this.prisma as any).systemMessage.create({ data });
   }
 
-  findAll() {
-    return (this.prisma as any).systemMessage.findMany({
-      include: { user: true }
+  async findAll() {
+    return await (this.prisma as any).systemMessage.findMany({
+      include: { user: true },
+      orderBy: { createdAt: 'desc' }
     });
   }
 
-  findOne(id: number) {
-    return (this.prisma as any).systemMessage.findUnique({
+  async findOne(id: number) {
+    const message = await (this.prisma as any).systemMessage.findUnique({
       where: { id },
       include: { user: true }
     });
+
+    if (!message) {
+      throw new NotFoundException(`Mensaje con id ${id} no encontrado`);
+    }
+
+    return message;
   }
 
-  update(id: number, data: UpdateSystemMessageDto) {
-    return (this.prisma as any).systemMessage.update({
+  async update(id: number, data: UpdateSystemMessageDto) {
+    const exists = await (this.prisma as any).systemMessage.findUnique({ where: { id } });
+
+    if (!exists) {
+      throw new NotFoundException(`No existe un mensaje con id ${id}`);
+    }
+
+    return await (this.prisma as any).systemMessage.update({
       where: { id },
       data
     });
   }
 
-  remove(id: number) {
-    return (this.prisma as any).systemMessage.delete({
-      where: { id }
-    });
+  async remove(id: number) {
+    const exists = await (this.prisma as any).systemMessage.findUnique({ where: { id } });
+
+    if (!exists) {
+      throw new NotFoundException(`No existe un mensaje con id ${id}`);
+    }
+
+    await (this.prisma as any).systemMessage.delete({ where: { id } });
+
+    return { message: `Mensaje con ID ${id} eliminado correctamente` };
   }
 }
