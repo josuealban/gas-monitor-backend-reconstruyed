@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateAlertDto } from './dto/create-alert.dto';
 import { UpdateAlertDto } from './dto/update-alert.dto';
 
 @Injectable()
 export class AlertsService {
-  create(createAlertDto: CreateAlertDto) {
-    return 'This action adds a new alert';
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(data: CreateAlertDto) {
+    return (this.prisma as any).alert.create({ data });
   }
 
   findAll() {
-    return `This action returns all alerts`;
+    return (this.prisma as any).alert.findMany({
+      include: {
+        user: true,
+        measurement: true,
+      },
+    });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} alert`;
+    return (this.prisma as any).alert.findUnique({
+      where: { id },
+      include: { user: true, measurement: true },
+    });
   }
 
-  update(id: number, updateAlertDto: UpdateAlertDto) {
-    return `This action updates a #${id} alert`;
+  update(id: number, dto: UpdateAlertDto) {
+    return (this.prisma as any).alert.update({
+      where: { id },
+      data: dto,
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} alert`;
+    return (this.prisma as any).alert.delete({ where: { id } });
   }
 }
