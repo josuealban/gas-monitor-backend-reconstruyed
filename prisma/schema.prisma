@@ -4,11 +4,139 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
+
 
 datasource db {
   provider = "postgresql"
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT_GENERAL
+  CLIENT_CHILD
+  SYSTEM
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  BLOCKED
+}
+
+model User {
+  id            Int         @id @default(autoincrement())
+  name          String
+  email         String      @unique
+  password      String
+  role          UserRole
+  status        UserStatus  @default(PENDING)
+  createdAt     DateTime    @default(now())
+
+  alerts        Alert[]
+  notifications SystemMessage[]
+  history       HistoryLog[]
+}
+
+model Device {
+  id          Int          @id @default(autoincrement())
+  name        String
+  location    String
+  apiKey      String       @unique
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+
+  measurements Measurement[]
+  history       HistoryLog[]
+}
+
+model GasType {
+  id        Int           @id @default(autoincrement())
+  name      String
+  threshold Float
+  unit      String        @default("%")
+  createdAt DateTime      @default(now())
+
+  measurements Measurement[]
+}
+
+enum RiskLevel {
+  NORMAL
+  WARNING
+  DANGER
+}
+
+model Measurement {
+  id         Int       @id @default(autoincrement())
+  value      Float
+  riskLevel  RiskLevel @default(NORMAL)
+  createdAt  DateTime  @default(now())
+
+  gasTypeId  Int
+  deviceId   Int
+
+  gasType    GasType   @relation(fields: [gasTypeId], references: [id])
+  device     Device    @relation(fields: [deviceId], references: [id])
+  alert      Alert?
+  history    HistoryLog[]
+}
+
+enum AlertType {
+  SYSTEM
+  GENERAL
+  CHILD_SAFE
+  ADMIN_ACTION
+}
+
+model Alert {  
+  id             Int         @id @default(autoincrement())
+  category       AlertType
+  message        String
+  createdAt      DateTime    @default(now())
+  acknowledged   Boolean     @default(false)
+
+  measurementId  Int?        @unique
+  measurement    Measurement? @relation(fields: [measurementId], references: [id])
+
+  userId         Int?
+  user           User?        @relation(fields: [userId], references: [id])
+}
+
+model SystemMessage {
+  id          Int        @id @default(autoincrement())
+  content     String
+  createdAt   DateTime   @default(now())
+  acknowledged Boolean   @default(false)
+
+  userId      Int?
+  user        User?      @relation(fields: [userId], references: [id])
+}
+
+enum HistoryType {
+  LOGIN
+  ALERT_TRIGGERED
+  MEASUREMENT_SAVED
+  DEVICE_CONNECTED
+  DEVICE_FAILURE
+  USER_STATUS_CHANGE
+  SYSTEM_EVENT
+}
+
+model HistoryLog {
+  id            Int          @id @default(autoincrement())
+  event         HistoryType
+  description   String
+  createdAt     DateTime     @default(now())
+
+  userId        Int?
+  deviceId      Int?
+  measurementId Int?
+
+  user          User?         @relation(fields: [userId], references: [id])
+  device        Device?       @relation(fields: [deviceId], references: [id])
+  measurement   Measurement?  @relation(fields: [measurementId], references: [id])
 }
