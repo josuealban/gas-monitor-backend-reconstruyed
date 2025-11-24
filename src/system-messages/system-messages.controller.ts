@@ -5,30 +5,30 @@ import { UpdateSystemMessageDto } from './dto/update-system-message.dto';
 
 @Controller('system-messages')
 export class SystemMessagesController {
-  constructor(private readonly systemMessagesService: SystemMessagesService) {}
+  constructor(private readonly service: SystemMessagesService) {}
 
   @Post()
-  create(@Body() createSystemMessageDto: CreateSystemMessageDto) {
-    return this.systemMessagesService.create(createSystemMessageDto);
+  create(@Body() dto: CreateSystemMessageDto) {
+    return this.service.create(dto);
   }
 
   @Get()
   findAll() {
-    return this.systemMessagesService.findAll();
+    return this.service.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.systemMessagesService.findOne(+id);
+    return this.service.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSystemMessageDto: UpdateSystemMessageDto) {
-    return this.systemMessagesService.update(+id, updateSystemMessageDto);
+  update(@Param('id') id: string, @Body() dto: UpdateSystemMessageDto) {
+    return this.service.update(+id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.systemMessagesService.remove(+id);
+    return this.service.remove(+id);
   }
 }

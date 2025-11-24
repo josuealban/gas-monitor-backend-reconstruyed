@@ -5,30 +5,30 @@ import { UpdateMeasurementDto } from './dto/update-measurement.dto';
 
 @Controller('measurements')
 export class MeasurementsController {
-  constructor(private readonly measurementsService: MeasurementsService) {}
+  constructor(private readonly service: MeasurementsService) {}
 
   @Post()
-  create(@Body() createMeasurementDto: CreateMeasurementDto) {
-    return this.measurementsService.create(createMeasurementDto);
+  create(@Body() dto: CreateMeasurementDto) {
+    return this.service.create(dto);
   }
 
   @Get()
   findAll() {
-    return this.measurementsService.findAll();
+    return this.service.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.measurementsService.findOne(+id);
+    return this.service.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMeasurementDto: UpdateMeasurementDto) {
-    return this.measurementsService.update(+id, updateMeasurementDto);
+  update(@Param('id') id: string, @Body() dto: UpdateMeasurementDto) {
+    return this.service.update(+id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.measurementsService.remove(+id);
+    return this.service.remove(+id);
   }
 }

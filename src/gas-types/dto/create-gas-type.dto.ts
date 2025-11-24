@@ -6,4 +6,6 @@ export class CreateGasTypeDto {
 
   @IsNumber()
   threshold: number;
+
+  unit?: string = "%";
 }

@@ -5,30 +5,30 @@ import { UpdateDeviceDto } from './dto/update-device.dto';
 
 @Controller('devices')
 export class DevicesController {
-  constructor(private readonly devicesService: DevicesService) {}
+  constructor(private readonly service: DevicesService) {}
 
   @Post()
   create(@Body() dto: CreateDeviceDto) {
-    return this.devicesService.create(dto);
+    return this.service.create(dto);
   }
 
   @Get()
   findAll() {
-    return this.devicesService.findAll();
+    return this.service.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.devicesService.findOne(+id);
+    return this.service.findOne(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateDeviceDto) {
-    return this.devicesService.update(+id, dto);
+    return this.service.update(+id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.devicesService.remove(+id);
+    return this.service.remove(+id);
   }
 }

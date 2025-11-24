@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateGasTypeDto } from './dto/create-gas-type.dto';
 import { UpdateGasTypeDto } from './dto/update-gas-type.dto';
 
 @Injectable()
 export class GasTypesService {
-  create(createGasTypeDto: CreateGasTypeDto) {
-    return 'This action adds a new gasType';
+  constructor(private readonly prisma: PrismaService) {}
+
+  create(data: CreateGasTypeDto) {
+    return (this.prisma as any).gasType.create({ data });
   }
 
   findAll() {
-    return `This action returns all gasTypes`;
+    return (this.prisma as any).gasType.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} gasType`;
+    return (this.prisma as any).gasType.findUnique({ where: { id } });
   }
 
-  update(id: number, updateGasTypeDto: UpdateGasTypeDto) {
-    return `This action updates a #${id} gasType`;
+  update(id: number, dto: UpdateGasTypeDto) {
+    return (this.prisma as any).gasType.update({ where: { id }, data: dto });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} gasType`;
+    return (this.prisma as any).gasType.delete({ where: { id } });
   }
 }

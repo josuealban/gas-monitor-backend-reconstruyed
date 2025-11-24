@@ -1,26 +1,39 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateSystemMessageDto } from './dto/create-system-message.dto';
 import { UpdateSystemMessageDto } from './dto/update-system-message.dto';
 
 @Injectable()
 export class SystemMessagesService {
-  create(createSystemMessageDto: CreateSystemMessageDto) {
-    return 'This action adds a new systemMessage';
+  constructor(private prisma: PrismaService) {}
+
+  create(data: CreateSystemMessageDto) {
+    return (this.prisma as any).systemMessage.create({ data });
   }
 
   findAll() {
-    return `This action returns all systemMessages`;
+    return (this.prisma as any).systemMessage.findMany({
+      include: { user: true }
+    });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} systemMessage`;
+    return (this.prisma as any).systemMessage.findUnique({
+      where: { id },
+      include: { user: true }
+    });
   }
 
-  update(id: number, updateSystemMessageDto: UpdateSystemMessageDto) {
-    return `This action updates a #${id} systemMessage`;
+  update(id: number, data: UpdateSystemMessageDto) {
+    return (this.prisma as any).systemMessage.update({
+      where: { id },
+      data
+    });
   }
 
   remove(id: number) {
-    return `This action removes a #${id} systemMessage`;
+    return (this.prisma as any).systemMessage.delete({
+      where: { id }
+    });
   }
 }
