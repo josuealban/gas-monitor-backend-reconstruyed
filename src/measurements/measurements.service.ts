@@ -16,28 +16,28 @@ export class MeasurementsService {
 
   async create(dto: CreateMeasurementDto) {
 
-    // 🔥 Validar GasType
+
     const gasType = await this.prisma.gasType.findUnique({
       where: { id: dto.gasTypeId },
     });
 
     if (!gasType) {
-      throw new NotFoundException(`❌ GasType con ID ${dto.gasTypeId} no existe`);
+      throw new NotFoundException(` GasType con ID ${dto.gasTypeId} no existe`);
     }
 
-    // 🔥 Validar Device
+  
     const device = await this.prisma.device.findUnique({
       where: { id: dto.deviceId },
     });
 
     if (!device) {
-      throw new NotFoundException(`❌ Device con ID ${dto.deviceId} no existe`);
+      throw new NotFoundException(` Device con ID ${dto.deviceId} no existe`);
     }
 
-    // 🔥 Determinar nivel de riesgo
+   
     const risk = this.calcularRiesgo(dto.value, gasType.threshold);
 
-    // 🔥 Crear medición
+
     const measurement = await this.prisma.measurement.create({
       data: {
         value: dto.value,
@@ -52,17 +52,17 @@ export class MeasurementsService {
       }
     });
 
-    // 🔥 Registrar historial
+    
     await this.prisma.historyLog.create({
       data: {
         event: HistoryType.MEASUREMENT_SAVED,
-        description: `📌 Medición guardada: ${measurement.value}${gasType.unit} (${gasType.name}) en ${device.location}`,
+        description: ` Medición guardada: ${measurement.value}${gasType.unit} (${gasType.name}) en ${device.location}`,
         measurementId: measurement.id,
         deviceId: device.id,
       }
     });
 
-    // 🔥 Si hay riesgo, crear alerta y agregar a historial
+    
     if (risk !== RiskLevel.NORMAL) {
       const tipo = risk === RiskLevel.DANGER ? AlertType.GENERAL : AlertType.SYSTEM;
 
@@ -77,7 +77,7 @@ export class MeasurementsService {
       await this.prisma.historyLog.create({
         data: {
           event: HistoryType.ALERT_TRIGGERED,
-          description: `🚨 Alerta registrada: ${alerta.message}`,
+          description: ` Alerta registrada: ${alerta.message}`,
           measurementId: measurement.id,
         },
       });

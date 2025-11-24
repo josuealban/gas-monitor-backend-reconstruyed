@@ -15,7 +15,7 @@ export class UserStatusService {
 
   async updateStatus(dto: CreateUserStatusDto) {
 
-    // 1️⃣ Validar usuario
+    
     const user = await this.client.user.findUnique({
       where: { id: dto.userId },
     });
@@ -24,13 +24,13 @@ export class UserStatusService {
       throw new NotFoundException(`Usuario con ID ${dto.userId} no existe`);
     }
 
-    // 2️⃣ Actualizar estado
+   
     const updated = await this.client.user.update({
       where: { id: dto.userId },
       data: { status: dto.status },
     });
 
-    // 3️⃣ Registrar historial
+    
     await this.client.historyLog.create({
       data: {
         event: HistoryType.USER_STATUS_CHANGE,
