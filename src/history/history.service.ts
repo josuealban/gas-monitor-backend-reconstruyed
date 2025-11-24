@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateHistoryDto } from './dto/create-history.dto';
 import { UpdateHistoryDto } from './dto/update-history.dto';
 
 @Injectable()
 export class HistoryService {
-  create(createHistoryDto: CreateHistoryDto) {
-    return 'This action adds a new history';
+  constructor(private readonly prisma: PrismaService) {}
+
+  
+  async create(_: CreateHistoryDto) {
+    throw new BadRequestException(' No está permitido crear historial manualmente. Solo el sistema puede hacerlo.');
   }
 
-  findAll() {
-    return `This action returns all history`;
+  
+  async registerEvent(data: CreateHistoryDto) {
+    return await (this.prisma as any).history.create({
+      data,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} history`;
+  async findAll() {
+    return await (this.prisma as any).history.findMany({
+      include: { user: true },
+      orderBy: { createdAt: 'desc' }
+    });
   }
 
-  update(id: number, updateHistoryDto: UpdateHistoryDto) {
-    return `This action updates a #${id} history`;
+  async findOne(id: number) {
+    const record = await (this.prisma as any).history.findUnique({
+      where: { id },
+      include: { user: true }
+    });
+
+    if (!record) throw new NotFoundException(`No existe historial con id ${id}`);
+
+    return record;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} history`;
+  
+  async update(id: number, data: UpdateHistoryDto) {
+    const exists = await (this.prisma as any).history.findUnique({ where: { id } });
+
+    if (!exists) throw new NotFoundException(`No existe historial con id ${id}`);
+
+    return await (this.prisma as any).history.update({
+      where: { id },
+      data
+    });
+  }
+
+ 
+  async remove(_: number) {
+    throw new BadRequestException('❌ No está permitido eliminar registros de historial.');
   }
 }
